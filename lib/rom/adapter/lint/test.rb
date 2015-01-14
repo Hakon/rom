@@ -61,6 +61,22 @@ module ROM
                "#{adapter}::setup must return an adapter instance"
         end
 
+        def lint_dataset_reader
+          return if adapter_instance.respond_to? :[]
+
+          fail Failure.new("dataset reader"),
+            "#{adapter_instance} must respond to []"
+        end
+
+        def lint_dataset_predicate
+          return if adapter_instance.respond_to? :dataset?
+
+          fail Failure.new("dataset predicate"),
+            "#{adapter_instance} must respond to dataset?"
+        end
+
+        private
+
         def adapter_instance
           Adapter.setup(uri)
         end
@@ -82,15 +98,6 @@ module ROM
       # @public
       module TestAdapter
         attr_reader :adapter, :uri
-
-        # TODO: dataset lints
-        def test_dataset_reader
-          assert_respond_to adapter_instance, :[]
-        end
-
-        def test_dataset_predicate
-          assert_respond_to adapter_instance, :dataset?
-        end
 
         # Create test methods
         ROM::Adapter::Lint::Linter.linter_methods.each do |name|
