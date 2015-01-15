@@ -30,7 +30,7 @@ module ROM
         # Create test methods
         ROM::Adapter::Lint::Linter.linter_methods.each do |name|
           define_method "test_#{name}" do
-            linter.public_send name
+            Lint.lint repository, uri
           end
         end
       end
