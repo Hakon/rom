@@ -1,7 +1,7 @@
 require "concord"
 
 module ROM
-  class Adapter
+  module Adapter
     module Lint
       class Linter
         Failure = Class.new(StandardError) do
@@ -13,10 +13,10 @@ module ROM
           end
         end
 
-        attr_reader :adapter, :uri
+        attr_reader :repository, :uri
 
-        def initialize(adapter, uri)
-          @adapter = adapter
+        def initialize(repository, uri)
+          @repository = repository
           @uri = uri
         end
 
@@ -33,53 +33,53 @@ module ROM
 
         def TODO_lint_failure
           fail Failure.new("test failure"),
-               "#{adapter} is always failing here"
+               "#{repository} is always failing here"
         end
 
         def lint_schemes
-          return if adapter.respond_to? :schemes
+          return if repository.respond_to? :schemes
 
           fail Failure.new("schemes"),
-               "#{adapter}#schemes must be implemented"
+               "#{repository}#schemes must be implemented"
         end
 
         def lint_schemes_is_an_array
-          return if adapter.schemes.instance_of? Array
+          return if repository.schemes.instance_of? Array
 
           fail Failure.new("schemes is an array"),
-               "#{adapter}#schemes must return an array with supported URI schemes"
+               "#{repository}#schemes must return an array with supported URI schemes"
         end
 
         def lint_schemes_returns_any_supported_scheme
-          return if adapter.schemes.any?
+          return if repository.schemes.any?
 
           fail Failure.new("schemes returns any supported scheme"),
-               "#{adapter}#schemes must return at least one supported URI scheme"
+               "#{repository}#schemes must return at least one supported URI scheme"
         end
 
-        def lint_adapter_setup
-          return if adapter_instance.instance_of? adapter
+        def lint_repository_setup
+          return if repository_instance.instance_of? repository
 
-          fail Failure.new("adapter setup"),
-               "#{adapter}::setup must return an adapter instance"
+          fail Failure.new("repository setup"),
+               "#{repository}::setup must return an repository instance"
         end
 
         def lint_dataset_reader
-          return if adapter_instance.respond_to? :[]
+          return if repository_instance.respond_to? :[]
 
           fail Failure.new("dataset reader"),
-               "#{adapter_instance} must respond to []"
+               "#{repository_instance} must respond to []"
         end
 
         def lint_dataset_predicate
-          return if adapter_instance.respond_to? :dataset?
+          return if repository_instance.respond_to? :dataset?
 
           fail Failure.new("dataset predicate"),
-               "#{adapter_instance} must respond to dataset?"
+               "#{repository_instance} must respond to dataset?"
         end
 
-        def adapter_instance
-          Adapter.setup(uri)
+        def repository_instance
+          Repository.setup(uri)
         end
       end
     end
