@@ -1,31 +1,31 @@
 require_relative "linter"
 
 module ROM
-  class Adapter
+  module Adapter
     module Lint
 
-      def self.lint(adapter, uri)
-        linter = Linter.new(adapter, uri)
+      def self.lint(repository, uri)
+        linter = Linter.new(repository, uri)
         linter.lint
       end
 
-      # This is a simple lint-test for an adapter class to ensure the basic
-      # interfaces are in place
+      # This is a simple lint-test for adapter's repository class to ensure the
+      # basic interfaces are in place
       #
       # @example
       #
       #   class MyAdapterTest < Minitest::Test
-      #     include ROM::Adapter::Lint::TestAdapter
+      #     include ROM::Adapter::Lint::TestRepository
       #
       #     def setup
-      #       @adapter = MyAdapter
+      #       @repository = MyRepository
       #       @uri = "super_db://something"
       #     end
       #   end
       #
       # @public
-      module TestAdapter
-        attr_reader :adapter, :uri
+      module TestRepository
+        attr_reader :repository, :uri
 
         # Create test methods
         ROM::Adapter::Lint::Linter.linter_methods.each do |name|
@@ -33,21 +33,15 @@ module ROM
             linter.public_send name
           end
         end
-
-        private
-
-        def linter
-          ROM::Adapter::Lint::Linter.new(adapter, uri)
-        end
       end
 
-      # This is a simple lint-test for an adapter dataset class to ensure the
+      # This is a simple lint-test for an repository dataset class to ensure the
       # basic behavior is correct
       #
       # @example
       #
       #  class MyDatasetLintTest < Minitest::Test
-      #    include ROM::Adapter::Lint::TestEnumerableDataset
+      #    include ROM::Repository::Lint::TestEnumerableDataset
       #
       #     def setup
       #       @data  = [{ name: 'Jane', age: 24 }, { name: 'Joe', age: 25 }]

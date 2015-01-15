@@ -8,7 +8,7 @@ module ROM
   class Setup
     # @private
     class Finalize
-      attr_reader :repositories, :datasets, :adapter_relation_map
+      attr_reader :repositories, :datasets, :repository_relation_map
 
       # @api private
       def initialize(repositories, relations, mappers, commands)
@@ -17,7 +17,7 @@ module ROM
         @mappers = mappers
         @commands = commands
         @datasets = {}
-        @adapter_relation_map = {}
+        @repository_relation_map = {}
       end
 
       # @api private
@@ -64,25 +64,22 @@ module ROM
 
       # @api private
       def build_relation(name, builder, options = {}, block = nil)
-        repo_name = options.fetch(:repository) { :default }
-        adapter = repositories[repo_name].adapter
+        repository = repositories[options.fetch(:repository) { :default }]
 
-        relation = builder.call(name, adapter) do |klass|
+        relation = builder.call(name, repository) do |klass|
           methods = klass.public_instance_methods
           klass.class_eval(&block) if block
           klass.relation_methods = klass.public_instance_methods - methods
         end
 
-        adapter.extend_relation_instance(relation)
-        adapter_relation_map[name] = adapter
+        repository.extend_relation_instance(relation)
+        repository_relation_map[name] = repository
 
         relation
       end
 
       # @api private
       def load_readers(relations)
-        return ReaderRegistry.new unless adapter_relation_map.any?
-
         reader_builder = ReaderBuilder.new(relations)
 
         readers = @mappers.each_with_object({}) do |(name, options, block), h|
@@ -93,15 +90,13 @@ module ROM
       end
 
       def load_commands(relations)
-        return CommandRegistry.new unless adapter_relation_map.any?
-
         commands = @commands.each_with_object({}) do |(name, definitions), h|
-          adapter = adapter_relation_map[name]
+          repository = repository_relation_map[name]
 
           rel_commands = {}
 
           definitions.each do |command_name, definition|
-            rel_commands[command_name] = adapter.command(
+            rel_commands[command_name] = repository.command(
               command_name, relations[name], definition
             )
           end

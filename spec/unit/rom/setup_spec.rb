@@ -4,12 +4,11 @@ describe ROM::Setup do
   describe '#finalize' do
     context 'with an adapter that supports schema inferring' do
       it 'builds relation from inferred schema' do
-        adapter = double('adapter').as_null_object
-        repo = double('repo', adapter: adapter).as_null_object
+        repo = double('repo').as_null_object
         dataset = double('dataset')
 
         allow(repo).to receive(:schema).and_return([:users])
-        allow(adapter).to receive(:dataset).with(:users).and_return(dataset)
+        allow(repo).to receive(:dataset).with(:users).and_return(dataset)
 
         setup = ROM::Setup.new(memory: repo)
         env = setup.finalize
@@ -17,6 +16,27 @@ describe ROM::Setup do
         users = env.relations.users
 
         expect(users.dataset).to be(dataset)
+      end
+    end
+
+    context 'empty setup' do
+      let(:setup) { ROM::Setup.new({}) }
+      let(:env) { setup.finalize }
+
+      it 'builds empty repositories' do
+        expect(env.repositories).to eql({})
+      end
+
+      it 'builds empty relations' do
+        expect(env.relations).to eql(ROM::RelationRegistry.new)
+      end
+
+      it 'builds empty mappers' do
+        expect(env.mappers).to eql(ROM::ReaderRegistry.new)
+      end
+
+      it 'builds empty commands' do
+        expect(env.commands).to eql(ROM::Registry.new)
       end
     end
   end
