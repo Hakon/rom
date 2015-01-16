@@ -3,12 +3,6 @@ require_relative "linter"
 module ROM
   module Adapter
     module Lint
-
-      def self.lint(repository, uri)
-        linter = Linter.new(repository, uri)
-        linter.lint
-      end
-
       # This is a simple lint-test for adapter's repository class to ensure the
       # basic interfaces are in place
       #
@@ -30,8 +24,12 @@ module ROM
         # Create test methods
         ROM::Adapter::Lint::Linter.linter_methods.each do |name|
           define_method "test_#{name}" do
-            Lint.lint repository, uri
+            linter.public_send name
           end
+        end
+
+        def linter
+          ROM::Adapter::Lint::Linter.new(repository, uri)
         end
       end
 
