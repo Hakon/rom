@@ -18,11 +18,8 @@ module ROM
         lints.each { |lint| yield lint, self }
       end
 
-      def lint
-        self.class.linter_methods.each do |name|
-          lint name
-          puts "#{name}: ok"
-        end
+      def lint(name)
+        public_send name
       end
     end
   end
