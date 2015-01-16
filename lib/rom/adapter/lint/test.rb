@@ -1,4 +1,5 @@
 require 'rom/adapter/lint/repository'
+require 'rom/adapter/lint/enumerable_dataset'
 
 module ROM
   module Adapter
@@ -54,16 +55,18 @@ module ROM
       module TestEnumerableDataset
         attr_reader :dataset, :data
 
-        def test_each
-          result = []
-          dataset.each { |tuple| result << tuple }
-          assert_equal result, data,
-            "#{dataset.class}#each must yield tuples"
+        ROM::Adapter::Lint::EnumerableDataset.linter_methods.each do |name|
+          define_method "test_#{name}" do
+            begin
+              linter.public_send(name)
+            rescue ROM::Adapter::Linter::Failure => f
+              raise Minitest::Assertion, f.message
+            end
+          end
         end
 
-        def test_to_a
-          assert_equal dataset.to_a, data,
-            "#{dataset.class}#to_a must cast dataset to an array"
+        def linter
+          ROM::Adapter::Lint::EnumerableDataset.new(dataset, data)
         end
       end
     end
