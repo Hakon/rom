@@ -1,4 +1,4 @@
-require_relative "linter"
+require 'rom/adapter/lint/repository'
 
 module ROM
   module Adapter
@@ -22,18 +22,18 @@ module ROM
         attr_reader :repository, :uri
 
         # Create test methods
-        ROM::Adapter::Lint::Linter.linter_methods.each do |name|
+        ROM::Adapter::Lint::Repository.linter_methods.each do |name|
           define_method "test_#{name}" do
             begin
               linter.public_send(name)
-            rescue ROM::Adapter::Lint::Linter::Failure => f
+            rescue ROM::Adapter::Linter::Failure => f
               raise Minitest::Assertion, f.message
             end
           end
         end
 
         def linter
-          ROM::Adapter::Lint::Linter.new(repository, uri)
+          ROM::Adapter::Lint::Repository.new(repository, uri)
         end
       end
 

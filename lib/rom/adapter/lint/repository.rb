@@ -3,7 +3,7 @@ require 'rom/adapter/linter'
 module ROM
   module Adapter
     module Lint
-      class Linter < ROM::Adapter::Linter
+      class Repository < ROM::Adapter::Linter
         attr_reader :repository, :uri
 
         def initialize(repository, uri)
@@ -54,7 +54,7 @@ module ROM
         end
 
         def repository_instance
-          Repository.setup(uri)
+          ROM::Repository.setup(uri)
         end
       end
     end
