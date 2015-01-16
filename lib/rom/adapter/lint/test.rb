@@ -23,18 +23,14 @@ module ROM
         attr_reader :repository, :uri
 
         # Create test methods
-        ROM::Adapter::Lint::Repository.linter_methods.each do |name|
+        ROM::Adapter::Lint::Repository.each_lint do |name, linter|
           define_method "test_#{name}" do
             begin
-              linter.public_send(name)
+              linter.new(repository, uri).public_send(name)
             rescue ROM::Adapter::Linter::Failure => f
               raise Minitest::Assertion, f.message
             end
           end
-        end
-
-        def linter
-          ROM::Adapter::Lint::Repository.new(repository, uri)
         end
       end
 
@@ -55,18 +51,14 @@ module ROM
       module TestEnumerableDataset
         attr_reader :dataset, :data
 
-        ROM::Adapter::Lint::EnumerableDataset.linter_methods.each do |name|
+        ROM::Adapter::Lint::EnumerableDataset.each_lint do |name, linter|
           define_method "test_#{name}" do
             begin
-              linter.public_send(name)
+              linter.new(dataset, data).public_send(name)
             rescue ROM::Adapter::Linter::Failure => f
               raise Minitest::Assertion, f.message
             end
           end
-        end
-
-        def linter
-          ROM::Adapter::Lint::EnumerableDataset.new(dataset, data)
         end
       end
     end
