@@ -24,7 +24,11 @@ module ROM
         # Create test methods
         ROM::Adapter::Lint::Linter.linter_methods.each do |name|
           define_method "test_#{name}" do
-            linter.public_send name
+            begin
+              linter.public_send(name)
+            rescue ROM::Adapter::Lint::Linter::Failure => f
+              raise Minitest::Assertion, f.message
+            end
           end
         end
 

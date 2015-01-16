@@ -29,11 +29,6 @@ module ROM
           end
         end
 
-        def TODO_lint_failure
-          fail Failure.new("test failure"),
-               "#{repository} is always failing here"
-        end
-
         def lint_schemes
           return if repository.respond_to? :schemes
 
