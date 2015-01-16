@@ -1,32 +1,14 @@
+require 'rom/adapter/linter'
+
 module ROM
   module Adapter
     module Lint
-      class Linter
-        Failure = Class.new(StandardError) do
-          # ship some extra information in the error
-          attr_reader :lint_name
-
-          def initialize(lint_name)
-            @lint_name = lint_name
-          end
-        end
-
+      class Linter < ROM::Adapter::Linter
         attr_reader :repository, :uri
 
         def initialize(repository, uri)
           @repository = repository
           @uri = uri
-        end
-
-        def self.linter_methods
-          public_instance_methods(true).grep(/^lint_/).map(&:to_s)
-        end
-
-        def lint
-          self.class.linter_methods.each do |name|
-            public_send name
-            puts "#{name}: ok"
-          end
         end
 
         def lint_schemes
