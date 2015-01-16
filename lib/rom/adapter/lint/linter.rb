@@ -1,5 +1,3 @@
-require "concord"
-
 module ROM
   module Adapter
     module Lint
